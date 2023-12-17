@@ -1,3 +1,4 @@
+using DeliveryApp.BL;
 using DeliveryApp.DAL;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,13 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationContext>(options =>
 {
     options.UseNpgsql(connString);
 });
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<RegisterService>();
+builder.Services.AddScoped<IPasswordHasher, Md5PasswordHasherService>();
+builder.Services.AddScoped<ValidationService>();
 
 var app = builder.Build();
-
+app.MapControllers();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

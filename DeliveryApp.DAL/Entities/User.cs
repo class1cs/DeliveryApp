@@ -10,9 +10,13 @@ public class User
     
     public string Patronymic { get; set; }
     
-    public string Login { get; set; }
+    public string PhoneNumber { get; set; }
     
     public string PasswordHash { get; set; }
+
+    public List<Order> Orders { get; set; } = new();
+    
+    public string Login { get; set; }
     
     public Role Role { get; set; }
 }
