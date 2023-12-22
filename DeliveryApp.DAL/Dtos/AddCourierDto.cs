@@ -1,8 +1,10 @@
 ﻿namespace DeliveryApp.API.Dtos;
 
-public class RegisterUserDto
+public class AddCourierDto
 {
-    public string NumberPhone { get; set; }
+    public string PhoneNumber { get; set; }
+    
+    public string Password { get; set; }
     
     public string Name { get; set; }
     
@@ -10,7 +12,4 @@ public class RegisterUserDto
     
     public string Patronymic { get; set; }
     
-    public string Password { get; set; }
-    
-    public string ConfirmPassword { get; set; }
 }

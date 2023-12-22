@@ -23,6 +23,10 @@ public class ValidationService
             x.PhoneNumber == phoneNumber && x.PasswordHash == hash);
     }
     
+    public bool CheckPasswordMatch(string password, string confirmPassword)
+    {
+        return confirmPassword == password;
+    }
     
 }
         

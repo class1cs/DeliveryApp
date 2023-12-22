@@ -30,8 +30,13 @@ public class RegisterService
             Name = registerUserDto.Name,
             SecondName = registerUserDto.SecondName,
             Patronymic = registerUserDto.Patronymic,
-            PasswordHash = hash
+            PasswordHash = hash,
+            Role = await _appContext.Roles.FirstOrDefaultAsync(x => x.Name == "User")
         };
+        if (!_validationService.CheckPasswordMatch(registerUserDto.Password, registerUserDto.ConfirmPassword))
+        {
+            throw new InvalidCredentialException("Пароли не совпадают!");
+        }
         if (await _validationService.CheckExistUserAsync(userToAdd.PhoneNumber, registerUserDto.Password))
         {
             await _appContext.Users.AddAsync(userToAdd);

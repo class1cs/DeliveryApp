@@ -19,6 +19,7 @@ builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<IPasswordHasher, Md5PasswordHasherService>();
 builder.Services.AddScoped<ValidationService>();
+builder.Services.AddScoped<CourierService>();
 
 var app = builder.Build();
 app.MapControllers();
