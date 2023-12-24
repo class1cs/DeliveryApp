@@ -26,18 +26,19 @@ public class RegisterService
         var hash = _passwordHasherService.HashPassword(registerUserDto.Password);
         var userToAdd = new User()
         {
-            PhoneNumber = registerUserDto.NumberPhone,
+            Id = new Guid(),
             Name = registerUserDto.Name,
             SecondName = registerUserDto.SecondName,
             Patronymic = registerUserDto.Patronymic,
             PasswordHash = hash,
-            Role = await _appContext.Roles.FirstOrDefaultAsync(x => x.Name == "User")
+            Role = Role.User,
+            Login = registerUserDto.Login
         };
         if (!_validationService.CheckPasswordMatch(registerUserDto.Password, registerUserDto.ConfirmPassword))
         {
             throw new InvalidCredentialException("Пароли не совпадают!");
         }
-        if (await _validationService.CheckExistUserAsync(userToAdd.PhoneNumber, registerUserDto.Password))
+        if (await _validationService.CheckExistUserAsync(userToAdd.Login, registerUserDto.Password))
         {
             await _appContext.Users.AddAsync(userToAdd);
             await _appContext.SaveChangesAsync();

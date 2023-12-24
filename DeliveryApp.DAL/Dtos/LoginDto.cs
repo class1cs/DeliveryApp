@@ -1,8 +1,9 @@
 ﻿namespace DeliveryApp.API.Dtos;
 
-public class LoginUserDto
+public class LoginDto 
 {
-    public string NumberPhone { get; set; }
+    
+    public string Login { get; set; }
     
     public string Password { get; set; }
 }

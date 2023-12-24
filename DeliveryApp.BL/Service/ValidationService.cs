@@ -16,11 +16,11 @@ public class ValidationService
         _passwordHasherService = passwordHasherService;
     }
 
-    public Task<bool> CheckExistUserAsync(string phoneNumber, string password)
+    public Task<bool> CheckExistUserAsync(string login, string password)
     {
         var hash = _passwordHasherService.HashPassword(password);
         return _appContext.Users.AnyAsync(x =>
-            x.PhoneNumber == phoneNumber && x.PasswordHash == hash);
+            x.Login == login && x.PasswordHash == hash);
     }
     
     public bool CheckPasswordMatch(string password, string confirmPassword)

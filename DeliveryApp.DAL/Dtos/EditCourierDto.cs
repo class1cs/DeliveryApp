@@ -2,7 +2,7 @@
 
 namespace DeliveryApp.API.Dtos;
 
-public class EditCourierDto
+public class EditUserDto
 {
     public string Name { get; set; }
     
@@ -10,10 +10,11 @@ public class EditCourierDto
     
     public string Patronymic { get; set; }
     
-    public string PhoneNumber { get; set; }
+    public string Login { get; set; }
     
     public Role Role { get; set; }
     
     public string Password { get; set; }
+    
     
 }

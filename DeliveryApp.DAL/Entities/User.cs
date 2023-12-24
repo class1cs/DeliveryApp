@@ -10,8 +10,6 @@ public class User
     
     public string Patronymic { get; set; }
     
-    public string PhoneNumber { get; set; }
-    
     public string PasswordHash { get; set; }
 
     public List<Order> Orders { get; set; } = new();
@@ -19,4 +17,11 @@ public class User
     public string Login { get; set; }
     
     public Role Role { get; set; }
+}
+
+public enum Role
+{
+    User = 0,
+    Courier = 1,
+    Admin = 2
 }

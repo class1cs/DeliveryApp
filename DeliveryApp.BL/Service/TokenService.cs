@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using DeliveryApp.DAL;
 
@@ -19,7 +18,7 @@ public class TokenService
         // Достаем утверждения о юзере по его роли, далее преобразовываем в Claim и в список
         var claims = new List<Claim>();
 
-        claims.Add(new(ClaimTypes.Role, user.Role.Name));
+        claims.Add(new(ClaimTypes.Role, Role.Admin.ToString()));
         claims.Add(new("Id", user.Id.ToString()));
 
         var jwt = new JwtSecurityToken(AuthOptions.Issuer,
@@ -33,15 +32,4 @@ public class TokenService
 
         return encodedJwt;
     }
-}
-
-public class AuthOptions
-{
-    public const string Issuer = "DeliveryApp"; // издатель токена
-
-    public const string Audience = "Client"; // потребитель токена
-
-    private const string Key = "ultrasecretkey_topsecret131111237"; // ключ для шифрования
-    
-    public static SymmetricSecurityKey GetSymmetricSecurityKey() => new(Encoding.UTF8.GetBytes(Key));
 }

@@ -2,7 +2,7 @@
 
 public class RegisterUserDto
 {
-    public string NumberPhone { get; set; }
+    public string Login { get; set; }
     
     public string Name { get; set; }
     

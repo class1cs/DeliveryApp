@@ -17,42 +17,41 @@ public class CourierService
         _passwordHasher = passwordHasher;
         _validationService = validationService;
     }
-    public async Task AddCourierAsync(AddCourierDto addCourierDto)
+    public async Task AddUserAsync(AddUserDto addUserDto)
     {
-        if (await _validationService.CheckExistUserAsync(addCourierDto.PhoneNumber, addCourierDto.Password) == false)
+        if (await _validationService.CheckExistUserAsync(addUserDto.Login, addUserDto.Password) == false)
         {
-            throw new InvalidCredentialException("Этот курьер уже существует");
+            throw new InvalidCredentialException("Этот пользователь уже существует");
         }
         await _applicationContext.Users.AddAsync(new User
         {
-            PasswordHash = _passwordHasher.HashPassword(addCourierDto.Password),
-            Name = addCourierDto.Name,
-            SecondName = addCourierDto.SecondName,
-            Patronymic = addCourierDto.Patronymic,
-            PhoneNumber = addCourierDto.PhoneNumber, 
-            Role = await _applicationContext.Roles.FirstOrDefaultAsync(x => x.Name == "Courier")
+            PasswordHash = _passwordHasher.HashPassword(addUserDto.Password),
+            Name = addUserDto.Name,
+            SecondName = addUserDto.SecondName,
+            Patronymic = addUserDto.Patronymic,
+            Role = addUserDto.Role
         });
         await _applicationContext.SaveChangesAsync();
     }
     
-    public async Task EditCourierAsync(Guid id, EditCourierDto editCourierDto)
+    public async Task EditUserAsync(Guid id, EditUserDto editUserDto)
     {       
             var userToEdit = await _applicationContext.Users.FindAsync(id);
-            var hash = _passwordHasher.HashPassword(editCourierDto.Password);
+            var hash = _passwordHasher.HashPassword(editUserDto.Password);
             if (await _applicationContext.Users.AnyAsync(x =>
-                    x.PhoneNumber == editCourierDto.PhoneNumber && x.PasswordHash == hash) == false)
+                    x.Login == editUserDto.Login && x.PasswordHash == hash) == false)
             {
-                throw new InvalidCredentialException("Этот пароль или номер телефона уже занят другим курьером.");
+                throw new InvalidCredentialException("Этот пароль или логин уже занят другим курьером.");
             }
-            userToEdit.Name = editCourierDto.Name;
-            userToEdit.SecondName = editCourierDto.SecondName;
-            userToEdit.Patronymic = editCourierDto.Patronymic;
-            userToEdit.Role = editCourierDto.Role;
-            userToEdit.PhoneNumber = editCourierDto.PhoneNumber;
+            userToEdit.Name = editUserDto.Name;
+            userToEdit.SecondName = editUserDto.SecondName;
+            userToEdit.Patronymic = editUserDto.Patronymic;
+            userToEdit.Role = editUserDto.Role;
+            userToEdit.Login = editUserDto.Login;
             await _applicationContext.SaveChangesAsync();
     }
     
-    public async Task RemoveCourierAsync(Guid id)
+    public async Task RemoveUserAsync(Guid id)
     {       
         var userToDelete = await _applicationContext.Users.FindAsync(id);
         _applicationContext.Users.Remove(userToDelete);

@@ -4,6 +4,7 @@ using DeliveryApp.DAL;
 using DeliveryApp.BL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using LoginDto = DeliveryApp.API.Dtos.LoginDto;
 
 namespace DeliveryApp.API.Controllers
 {
@@ -31,12 +32,11 @@ namespace DeliveryApp.API.Controllers
 
         [HttpPost]
         [Route("/login")]
-        public async Task<ActionResult> Login([FromBody] LoginUserDto loginUserDto)
+        public async Task<ActionResult> Login([FromBody] LoginDto loginDto)
         {
             try
             {
-                var token = await _loginService.LoginAsync(loginUserDto);
-
+                var token = await _loginService.LoginAsync(loginDto);
                 return Ok(token);
             }
             catch (InvalidCredentialException e)
@@ -44,6 +44,8 @@ namespace DeliveryApp.API.Controllers
                 return Conflict(e.Message);
             }
         }
+        
+
         
         [HttpPost]
         [Route("/register")]
