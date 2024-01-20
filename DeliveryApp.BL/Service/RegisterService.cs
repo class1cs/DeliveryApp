@@ -40,10 +40,10 @@ public class RegisterService
         }
         if (await _validationService.CheckExistUserAsync(userToAdd.Login, registerUserDto.Password))
         {
-            await _appContext.Users.AddAsync(userToAdd);
-            await _appContext.SaveChangesAsync();
-            return await _tokenService.GenerateTokenAsync(userToAdd);
+            throw new InvalidCredentialException("Этот аккаунт уже существует!");
         }
-        throw new InvalidCredentialException("Этот аккаунт уже существует!");
+        await _appContext.Users.AddAsync(userToAdd);
+        await _appContext.SaveChangesAsync();
+        return await _tokenService.GenerateTokenAsync(userToAdd);
     }
 }

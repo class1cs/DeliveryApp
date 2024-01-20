@@ -18,7 +18,7 @@ public class TokenService
         // Достаем утверждения о юзере по его роли, далее преобразовываем в Claim и в список
         var claims = new List<Claim>();
 
-        claims.Add(new(ClaimTypes.Role, Role.Admin.ToString()));
+        claims.Add(new(ClaimTypes.Role, user.Role.ToString()));
         claims.Add(new("Id", user.Id.ToString()));
 
         var jwt = new JwtSecurityToken(AuthOptions.Issuer,

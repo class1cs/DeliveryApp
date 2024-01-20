@@ -23,7 +23,7 @@ builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<IPasswordHasher, Md5PasswordHasherService>();
 builder.Services.AddScoped<ValidationService>();
-builder.Services.AddScoped<CourierService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddSwaggerGen(setup =>
 {
     // Include 'SecurityScheme' to use JWT Authentication

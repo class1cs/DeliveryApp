@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeliveryApp.BL;
 
-public class CourierService
+public class UserService
 {
     private readonly ApplicationContext _applicationContext;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ValidationService _validationService;
     
-    public CourierService(ApplicationContext applicationContext, IPasswordHasher passwordHasher, ValidationService validationService)
+    public UserService(ApplicationContext applicationContext, IPasswordHasher passwordHasher, ValidationService validationService)
     {
         _applicationContext = applicationContext;
         _passwordHasher = passwordHasher;
@@ -36,19 +36,19 @@ public class CourierService
     
     public async Task EditUserAsync(Guid id, EditUserDto editUserDto)
     {       
-            var userToEdit = await _applicationContext.Users.FindAsync(id);
-            var hash = _passwordHasher.HashPassword(editUserDto.Password);
-            if (await _applicationContext.Users.AnyAsync(x =>
-                    x.Login == editUserDto.Login && x.PasswordHash == hash) == false)
-            {
-                throw new InvalidCredentialException("Этот пароль или логин уже занят другим курьером.");
-            }
-            userToEdit.Name = editUserDto.Name;
-            userToEdit.SecondName = editUserDto.SecondName;
-            userToEdit.Patronymic = editUserDto.Patronymic;
-            userToEdit.Role = editUserDto.Role;
-            userToEdit.Login = editUserDto.Login;
-            await _applicationContext.SaveChangesAsync();
+        var userToEdit = await _applicationContext.Users.FindAsync(id);
+        var hash = _passwordHasher.HashPassword(editUserDto.Password);
+        if (await _applicationContext.Users.AnyAsync(x =>
+                x.Login == editUserDto.Login && x.PasswordHash == hash) == false)
+        {
+            throw new InvalidCredentialException("Этот пароль или логин уже занят другим курьером.");
+        }
+        userToEdit.Name = editUserDto.Name;
+        userToEdit.SecondName = editUserDto.SecondName;
+        userToEdit.Patronymic = editUserDto.Patronymic;
+        userToEdit.Role = editUserDto.Role;
+        userToEdit.Login = editUserDto.Login;
+        await _applicationContext.SaveChangesAsync();
     }
     
     public async Task RemoveUserAsync(Guid id)

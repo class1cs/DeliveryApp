@@ -31,7 +31,7 @@ namespace DeliveryApp.API.Controllers
         }
 
         [HttpPost]
-        [Route("/login")]
+        [Route("login")]
         public async Task<ActionResult> Login([FromBody] LoginDto loginDto)
         {
             try
@@ -48,7 +48,7 @@ namespace DeliveryApp.API.Controllers
 
         
         [HttpPost]
-        [Route("/register")]
+        [Route("register")]
         public async Task<ActionResult> Register([FromBody] RegisterUserDto registerUserDto)
         {
             try
