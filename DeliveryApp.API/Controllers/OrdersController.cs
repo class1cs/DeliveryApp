@@ -32,7 +32,11 @@ namespace DeliveryApp.API.Controllers
             
             foreach (var item in createOrderDto.Items)
             {
-                var product = await _appContext.Products.FindAsync(item.ProductId);
+                var product = await _appContext.Products.FirstOrDefaultAsync(x => x.Id == item.ProductId);
+                if (product == null)
+                {
+                    return BadRequest("Такого продукта еще нет в нашей базе.");
+                }
                 items.Add(new Item { Product = product, Count = item.Count, TotalSum = product.Cost * item.Count});
             }
             
@@ -54,7 +58,11 @@ namespace DeliveryApp.API.Controllers
             
             var currentUserGuidId = Guid.Parse(currentUserId);
             var currentUser = _appContext.Users.FirstOrDefault(x => x.Id == currentUserGuidId);
-            var orderToCancel = await _appContext.Orders.FindAsync(orderId);
+            var orderToCancel = await _appContext.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
+            if (orderToCancel == null)
+            {
+                return NotFound("Этого заказа не существует!");
+            }
             if (orderToCancel.Status != OrderStatus.Accepted)
             {
                 return BadRequest("Этот заказ не выполняется!");
@@ -91,7 +99,7 @@ namespace DeliveryApp.API.Controllers
             
             if (order == null)
             {
-                return BadRequest("Такого заказа не существует!");
+                return NotFound("Такого заказа не существует!");
             }
             if (order.Status == OrderStatus.Free)
             {
@@ -115,10 +123,10 @@ namespace DeliveryApp.API.Controllers
             }
             var currentUserGuidId = Guid.Parse(currentUserId);
             var currentUser = _appContext.Users.FirstOrDefault(x => x.Id == currentUserGuidId);
-            var order = await _appContext.Orders.FindAsync(orderId);
+            var order = await _appContext.Orders.FirstOrDefaultAsync(x => x.Id == orderId);
             if (order == null)
             {
-                return BadRequest("Такого заказа не существует!");
+                return NotFound("Такого заказа не существует!");
             }
             if (currentUser.Orders.Contains(order) && order.Status == OrderStatus.Accepted)
             {
