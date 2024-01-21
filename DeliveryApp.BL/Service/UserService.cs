@@ -38,8 +38,8 @@ public class UserService
     {       
         var userToEdit = await _applicationContext.Users.FindAsync(id);
         var hash = _passwordHasher.HashPassword(editUserDto.Password);
-        if (await _applicationContext.Users.AnyAsync(x =>
-                x.Login == editUserDto.Login && x.PasswordHash == hash) == false)
+        
+        if (await _applicationContext.Users.Where(x => x.Login != userToEdit.Login && x.PasswordHash != userToEdit.PasswordHash).AnyAsync(x => x.Login == editUserDto.Login && x.PasswordHash == hash))
         {
             throw new InvalidCredentialException("Этот пароль или логин уже занят другим курьером.");
         }
@@ -48,6 +48,8 @@ public class UserService
         userToEdit.Patronymic = editUserDto.Patronymic;
         userToEdit.Role = editUserDto.Role;
         userToEdit.Login = editUserDto.Login;
+        userToEdit.PasswordHash = hash;
+        
         await _applicationContext.SaveChangesAsync();
     }
     

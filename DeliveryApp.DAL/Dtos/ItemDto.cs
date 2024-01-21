@@ -7,5 +7,4 @@ public class ItemDto
     
     public long Count { get; set; }
     
-    public decimal TotalSum { get; set; }
 }
