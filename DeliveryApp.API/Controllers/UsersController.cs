@@ -76,24 +76,40 @@ namespace DeliveryApp.API.Controllers
         }
         
         [Authorize(Roles = "Admin")]
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<IActionResult> Get(Guid id)
         {
             var user = await _applicationContext.Users.Include(x => x.Orders).FirstOrDefaultAsync(x => x.Id == id);
-           return Ok(user);
+            return Ok(user);
         }
         
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<IActionResult> GetAll(Role? role = null)
+        public async Task<IActionResult> GetAll()
         {
-            if (role == null)
+            var allUsers = await _applicationContext
+                .Users
+                .AsNoTracking()
+                .Include(x => x.Orders)
+                .ThenInclude(x => x.Items)
+                .ThenInclude(x => x.Product).AsSplitQuery().ToListAsync();
+            
+            var allUsersDtos = allUsers.Select(x => new UserResponseDto
             {
-                var allUsers = await _applicationContext.Users.Include(x => x.Orders).ThenInclude(x => x.Items).ToListAsync();
-                return Ok(allUsers);
-            }
-            var users = await _applicationContext.Users.Include(x => x.Orders).ThenInclude(x => x.Items).Where(x => x.Role == role).ToListAsync();
-            return Ok(users);
+                Id = x.Id, 
+                Login = x.Login,
+                Orders = x.Orders.Select(x => new OrderResponseDto
+                {
+                    DeliveryDate = x.DeliveryDate, 
+                    Id = x.Id,
+                    Items = x.Items, 
+                    Requests = x.Requests,
+                    Status = x.Status
+                }).ToList(),
+                Name = x.Name, PasswordHash = x.PasswordHash, Patronymic = x.Patronymic, Role = x.Role,
+                SecondName = x.SecondName
+            });
+            return Ok(allUsersDtos);
         }
     }
 }

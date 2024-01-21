@@ -134,7 +134,41 @@ namespace DeliveryApp.API.Controllers
                 await _appContext.SaveChangesAsync();
                 return Ok("Заказ успешно подтвержден!");
             }
-            return BadRequest("Этот заказ не ваш.");
+            return BadRequest("Этот заказ не ваш или еще не в работе.");
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var allOrders = await _appContext.Orders.Include(x => x.Users).Include(x => x.Items).AsSplitQuery().ToListAsync();
+            var allOrdersDtos = allOrders.Select(x => new OrderResponseDto
+            {
+                DeliveryDate = x.DeliveryDate,
+                Id = x.Id,
+                Items = x.Items,
+                Requests = x.Requests,
+                Status = x.Status,
+                UserIds = x.Users.Select(x => x.Id).ToList()
+            });
+            return Ok(allOrdersDtos);
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> GetAll(Guid orderId)
+        {
+            var order = await _appContext.Orders.Include(x => x.Users).Include(x => x.Items).AsSplitQuery().FirstOrDefaultAsync(x => x.Id == orderId);
+            var orderDto = new OrderResponseDto
+            {
+                DeliveryDate = order.DeliveryDate,
+                Id = order.Id,
+                Items = order.Items,
+                Requests = order.Requests,
+                Status = order.Status,
+                UserIds = order.Users.Select(x => x.Id).ToList()
+            };
+            return Ok(orderDto);
         }
     }
 }

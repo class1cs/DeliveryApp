@@ -13,9 +13,8 @@ public class Order
     public string Requests { get; set; }
     
     public OrderStatus Status { get; set; }
-    
-    [JsonIgnore]
-    public List<User> Users { get; set; }
+
+    public List<User> Users { get; set; } = new List<User>();
 }
 
 public enum OrderStatus
