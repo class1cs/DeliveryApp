@@ -1,9 +1,7 @@
-using System.Security.Authentication;
 using DeliveryApp.API.Dtos;
 using DeliveryApp.BL;
 using DeliveryApp.DAL;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,30 +15,32 @@ namespace DeliveryApp.API.Controllers
         private readonly ApplicationContext _applicationContext;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ValidationService _validationService;
-        private readonly UserService _userService;
 
-        public UsersController(ApplicationContext applicationContext, IPasswordHasher passwordHasher, ValidationService validationService, UserService userService)
+        public UsersController(ApplicationContext applicationContext, IPasswordHasher passwordHasher, ValidationService validationService)
         {
             _applicationContext = applicationContext;
             _passwordHasher = passwordHasher;
             _validationService = validationService;
-            _userService = userService;
         }
         
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] AddUserDto addUserDto)
         {
-            try
+            if (await _validationService.CheckExistUserAsync(addUserDto.Login, addUserDto.Password) == false)
             {
-                await _userService.AddUserAsync(addUserDto);
-                return Ok("Пользователь успешно добавлен!");
+                return Conflict("Этот пользователь уже существует");
             }
-            catch (InvalidCredentialException e)
+            await _applicationContext.Users.AddAsync(new User
             {
-                return Conflict(e.Message);
-            }
-            
+                PasswordHash = _passwordHasher.HashPassword(addUserDto.Password),
+                Name = addUserDto.Name,
+                SecondName = addUserDto.SecondName,
+                Patronymic = addUserDto.Patronymic,
+                Role = addUserDto.Role
+            });
+            await _applicationContext.SaveChangesAsync();
+            return Ok("Пользователь был успешно добавлен!");
         }
         
         [Authorize(Roles = "Admin")]
@@ -49,30 +49,41 @@ namespace DeliveryApp.API.Controllers
         {
             try
             {
-                await _userService.RemoveUserAsync(id);
-                return Ok("Пользователь успешно удален!");
+                var userToDelete = await _applicationContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+                if (userToDelete == null)
+                {
+                    return NotFound("Пользователь не найден!");
+                }
+                _applicationContext.Users.Remove(userToDelete);
+                await _applicationContext.SaveChangesAsync();
+                return NotFound("Пользователь успешно удален.");
             }
-            catch (InvalidCredentialException e)
+            catch (DbUpdateConcurrencyException e)
             {
-                return Conflict(e.Message);
+                return BadRequest("Произошла неизвестная ошибка.");
             }
-            
         }
         
         [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> Edit(Guid id, [FromBody] EditUserDto editUserDto)
         {
-            try
+            var userToEdit = await _applicationContext.Users.FindAsync(id);
+            var hash = _passwordHasher.HashPassword(editUserDto.Password);
+            var users = _applicationContext.Users.Where(x =>
+                x.Login != userToEdit.Login && x.PasswordHash != userToEdit.PasswordHash);
+            if (await users.AnyAsync(x => x.Login == editUserDto.Login && x.PasswordHash == hash))
             {
-                await _userService.EditUserAsync(id, editUserDto);
-                return Ok("Пользователь успешно отредактирован!");
+               return Conflict("Этот пароль или логин уже занят другим курьером.");
             }
-            catch (InvalidCredentialException e)
-            {
-                return Conflict(e.Message);
-            }
-            
+            userToEdit.Name = editUserDto.Name;
+            userToEdit.SecondName = editUserDto.SecondName;
+            userToEdit.Patronymic = editUserDto.Patronymic;
+            userToEdit.Role = editUserDto.Role;
+            userToEdit.Login = editUserDto.Login;
+            userToEdit.PasswordHash = hash;
+            await _applicationContext.SaveChangesAsync();
+            return Ok("Пользователь был успешно изменен.");
         }
         
         [Authorize(Roles = "Admin")]

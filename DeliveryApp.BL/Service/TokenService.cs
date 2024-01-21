@@ -14,8 +14,6 @@ public class TokenService
     public async Task<string> GenerateTokenAsync(User user)
     {
         var role = user.Role;
-
-        // Достаем утверждения о юзере по его роли, далее преобразовываем в Claim и в список
         var claims = new List<Claim>();
 
         claims.Add(new(ClaimTypes.Role, user.Role.ToString()));
